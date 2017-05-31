@@ -30,17 +30,23 @@
             serviceInterface="com.intellij.flashcards.storage.FlashcardStorage"
             serviceImplementation="com.intellij.flashcards.storage.FlashcardStorage">
     </applicationService>
+    <toolWindow id="Flashcards" secondary="true" icon="/img/hotkeys_16.png" anchor="right" factoryClass="com.intellij.flashcards.ui.FlashcardToolWindowFactory"/>
   </extensions>
 
-
+  <application-components>
+    <component>
+      <interface-class>com.intellij.flashcards.Flashcards</interface-class>
+      <implementation-class>com.intellij.flashcards.Flashcards</implementation-class>
+    </component>
+  </application-components>
 
   <actions>
     <group id="Flashcards.FlashcardsMenu" text="Flashcard Menu" description="Flashcard Menu">
       <add-to-group group-id="MainToolBar" anchor="last"/>
       <!-- Add your actions here -->
-      <action id="FlashcardsPluginDialog" class="com.intellij.flashcards.ui.ShowDialogBox" text="Open flashcards plugin" description="Open flashcards plugin" icon="/img/hotkeys_16.png">
+      <!--<action id="FlashcardsPluginDialog" class="com.intellij.flashcards.ui.ShowDialogBox" text="Open flashcards plugin" description="Open flashcards plugin" icon="/img/hotkeys_16.png">-->
 
-      </action>
+      <!--</action>-->
     </group>
   </actions>
 
