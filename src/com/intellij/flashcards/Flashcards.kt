@@ -2,6 +2,7 @@ package com.intellij.flashcards
 
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.components.ApplicationComponent
 import java.time.LocalDateTime
 import java.util.*
@@ -17,13 +18,8 @@ class Flashcards : ApplicationComponent {
 
     private fun initActions() {
         actions += ActionManager.getInstance().run {
-            getActionIds("").map { getAction(it) }
-                    .filter { it.shortcutSet.shortcuts.isNotEmpty() }
+            getActionIds("").map { getAction(it) }.filter { it.shortcutSet.shortcuts.any { it is KeyboardShortcut } }
         }
-    }
-
-    enum class RecallGrade(val text: String) {
-        FAIL("Fail"), HARD("Hard"), GOOD("Good"), EASY("Easy")
     }
 
     fun getNextReviewAction(): AnAction {
