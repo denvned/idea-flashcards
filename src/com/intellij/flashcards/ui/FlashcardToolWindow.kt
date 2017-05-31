@@ -8,13 +8,17 @@ import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.components.Label
+import com.intellij.ui.components.htmlComponent
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.layout.LayoutBuilder
 import com.intellij.ui.layout.panel
+import java.awt.Font
+import java.awt.Rectangle
 import javax.swing.JButton
 
 class FlashcardToolWindow(val toolWindow: ToolWindow) {
     private val contentFactory = ContentFactory.SERVICE.getInstance()
+    private val LEFT_MARGIN = 10
 
     fun showNextQuestion() {
         val flashcards = ApplicationManager.getApplication().getComponent("Flashcards") as Flashcards
@@ -36,6 +40,7 @@ class FlashcardToolWindow(val toolWindow: ToolWindow) {
         showCard {
             showAction(action)
             row {
+                label(gapLeft = LEFT_MARGIN, text = "")
                 JButton("Show Answer").apply {
                     addActionListener {
                         showAnswer(action)
@@ -50,17 +55,25 @@ class FlashcardToolWindow(val toolWindow: ToolWindow) {
             showAction(action)
 
             row {
-                label("Answer:")
+                label(gapLeft = LEFT_MARGIN, text = "Answer:")
             }
             action.shortcutSet.shortcuts.filterIsInstance<KeyboardShortcut>().forEach {
                 row {
-                    label(arrayOf(it.firstKeyStroke, it.secondKeyStroke).filterNotNull().map { SubKeymapUtil.getKeyStrokeTextSub(it) }.joinToString())
+                    label(gapLeft = LEFT_MARGIN, text = (""))
+
+                    val button = JButton(arrayOf(it.firstKeyStroke, it.secondKeyStroke)
+                            .filterNotNull()
+                            .map { SubKeymapUtil.getKeyStrokeTextSub(it) }
+                            .joinToString())()
+                            .apply { enabled = false }
                 }
             }
             row {
-                label(("How hard was it to recall?"))
+                label(gapLeft = LEFT_MARGIN, text = ("How hard was it to recall?"), bold = true)
             }
             row {
+
+                label(gapLeft = LEFT_MARGIN, text = "")
                 RecallGrade.values().forEach {
                     JButton(it.text).apply {
                         addActionListener {
@@ -74,13 +87,22 @@ class FlashcardToolWindow(val toolWindow: ToolWindow) {
 
     private fun LayoutBuilder.showAction(action: AnAction) {
         row {
-            label(("Do you remember the shortcut for the following action?"))
+            label(gapLeft = LEFT_MARGIN, text = (" "))
+        }
+
+        row {
+            label(gapLeft = LEFT_MARGIN, text = ("Do you remember the shortcut for the following action?"))
         }
         row {
-            Label(action.templatePresentation.text ?: "").apply { icon = action.templatePresentation.icon }()
+            label(gapLeft = LEFT_MARGIN, text = "")
+            Label(action.templatePresentation.text ?: "").apply {
+                icon = action.templatePresentation.icon
+                font = Font("Verdana", Font.BOLD, 12)
+                bounds = Rectangle(0, 0, 100, 100)
+            }()
         }
         row {
-            label(action.templatePresentation.description)
+            label(gapLeft = LEFT_MARGIN, text = "Description: ${action.templatePresentation.description}")
         }
     }
 }
