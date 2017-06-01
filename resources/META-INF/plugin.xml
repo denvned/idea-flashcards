@@ -30,7 +30,6 @@
             serviceInterface="com.intellij.flashcards.storage.FlashcardStorage"
             serviceImplementation="com.intellij.flashcards.storage.FlashcardStorage">
     </applicationService>
-    <toolWindow id="Flashcards" secondary="true" icon="/img/hotkeys_16.png" anchor="right" factoryClass="com.intellij.flashcards.ui.FlashcardToolWindowFactory"/>
   </extensions>
 
   <application-components>
@@ -40,14 +39,18 @@
     </component>
   </application-components>
 
-  <actions>
-    <group id="Flashcards.FlashcardsMenu" text="Flashcard Menu" description="Flashcard Menu">
-      <add-to-group group-id="MainToolBar" anchor="last"/>
-      <!-- Add your actions here -->
-      <!--<action id="FlashcardsPluginDialog" class="com.intellij.flashcards.ui.ShowDialogBox" text="Open flashcards plugin" description="Open flashcards plugin" icon="/img/hotkeys_16.png">-->
+  <project-components>
+    <component>
+      <interface-class>com.intellij.flashcards.ui.FlashcardToolWindow</interface-class>
+      <implementation-class>com.intellij.flashcards.ui.FlashcardToolWindow</implementation-class>
+    </component>
+  </project-components>
 
-      <!--</action>-->
-    </group>
+  <actions>
+    <action id="Flashcards" class="com.intellij.flashcards.ui.ShowFlashcards" text="Flashcards"
+            description="Learn keyboard shortcuts">
+      <add-to-group group-id="HelpMenu" anchor="after" relative-to-action="ProductivityGuide"/>
+    </action>
   </actions>
 
 </idea-plugin>
