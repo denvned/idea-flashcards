@@ -78,8 +78,12 @@ class Flashcards : PersistentStateComponent<Database> {
         reviewQueue += card
     }
 
-    fun getCurrentLearnProgress(): String {
-        return "42%"
+    fun getCurrentLearnProgress(): Pair<Int, Int> {
+        val totalShortcuts = learnQueue.size + reviewQueue.size
+        val totalPoints = reviewQueue.count {
+            (it.nextReviewDate ?: 0L) - (it.lastReviewDate ?: 0L) > SHORTCUT_LEARNED_INTERVAL
+        }
+        return totalPoints to totalShortcuts
     }
 
     companion object {
@@ -87,5 +91,6 @@ class Flashcards : PersistentStateComponent<Database> {
         private const val TARGET_PROBABILITY = 0.7
         private const val MILLIS_PER_DAY = 24 * 60 * 60 * 1000L
         private const val INITIAL_INTERVAL = MILLIS_PER_DAY / 12
+        private const val SHORTCUT_LEARNED_INTERVAL = 30 * MILLIS_PER_DAY
     }
 }

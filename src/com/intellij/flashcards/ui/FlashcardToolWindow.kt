@@ -15,17 +15,18 @@ import com.intellij.openapi.wm.ToolWindowAnchor
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.ui.components.Label
 import com.intellij.ui.content.ContentFactory
+import com.intellij.ui.layout.CCFlags
+import com.intellij.ui.layout.LCFlags
 import com.intellij.ui.layout.LayoutBuilder
 import com.intellij.ui.layout.panel
 import com.intellij.util.ui.UIUtil
-import java.awt.*
+import java.awt.Color
+import java.awt.Font
 import java.awt.event.KeyEvent
 import javax.swing.BorderFactory
 import javax.swing.JButton
-import javax.swing.JPanel
 import javax.swing.border.CompoundBorder
 import javax.swing.border.EmptyBorder
-
 
 class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindowManager) : ProjectComponent {
     private lateinit var toolWindow: ToolWindow
@@ -64,12 +65,12 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
 
     private fun showNoMoreCards() = showContent {
         row {
-            label(gapLeft = LEFT_MARGIN, text = "Congratulations, you review all the cards for now!")
+            label(gapLeft = LEFT_MARGIN, text = "Congratulations, you've reviewed all the cards for now!")
         }
     }
 
     fun showContent(init: LayoutBuilder.() -> Unit) {
-        val panel = panel {
+        val panel = panel(LCFlags.fill) {
             init()
         }
 
@@ -80,11 +81,8 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
 
     private fun showQuestion(card: Flashcard) = showContent {
         showAction(card.action)
+        row(" ") {}
         row {
-            label(gapLeft = LEFT_MARGIN, text = " ")
-        }
-        row {
-            label(gapLeft = 12 * LEFT_MARGIN, text = "")
             JButton("Show Answer").apply {
                 //border = CompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 2), EmptyBorder(0, 10, 0, 10))
                 border = CompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 1), CompoundBorder(BorderFactory.createRaisedSoftBevelBorder(), EmptyBorder(0, 10, 0, 10)))
@@ -94,18 +92,17 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
                 addActionListener {
                     showAnswer(card)
                 }
-            }()
+            }(gapLeft = 12 * LEFT_MARGIN)
         }
         showProgress()
     }
 
     private fun showAnswer(card: Flashcard) = showContent {
         showAction(card.action)
-        row { label(gapLeft = LEFT_MARGIN, text = " ") }
-        row { label(gapLeft = LEFT_MARGIN, text = " ") }
+        row(" ") {}
+        row(" ") {}
         card.shortcuts.forEach {
             row {
-                label(gapLeft = 5 * LEFT_MARGIN, text = " ")
                 Label(arrayOf(it.firstKeyStroke, it.secondKeyStroke)
                         .filterNotNull()
                         .map { SubKeymapUtil.getKeyStrokeTextSub(it) }
@@ -115,29 +112,18 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
                     border = CompoundBorder(BorderFactory.createRaisedSoftBevelBorder(), EmptyBorder(0, 10, 0, 10))
                     background = Color.WHITE
                     isOpaque = true
-                }()
+                }(gapLeft = 5 * LEFT_MARGIN)
             }
         }
-        row { label(gapLeft = LEFT_MARGIN, text = " ") }
-//            row { label(gapLeft = LEFT_MARGIN, text = " ") }
-//            row {
-//                label(gapLeft = LEFT_MARGIN, text = "")
-//                JSeparator(JSeparator.HORIZONTAL).apply {
-//                    border = BorderFactory.createLineBorder(Color.GRAY)
-//                    preferredSize = Dimension(420, 1)
-//                }()
-//            }
-        row { label(gapLeft = LEFT_MARGIN, text = " ") }
+        row(" ") {}
+        row(" ") {}
         row {
-            label(gapLeft = LEFT_MARGIN, text = "")
             Label("How hard was it to recall?").apply {
-                font = Font("Verdana", Font.PLAIN, 15)
-            }()
+                font =  UIUtil.getLabelFont().deriveFont(15.0f)
+            }(gapLeft = LEFT_MARGIN)
         }
         row {
-
-            label(gapLeft = LEFT_MARGIN, text = "")
-            RecallGrade.values().forEach { recallGrade ->
+            RecallGrade.values().forEachIndexed { index, recallGrade ->
                 val nextReviewDate = flashcards.calculateNextReviewDate(card, recallGrade)
 
                 JButton(recallGrade.text).apply {
@@ -150,7 +136,7 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
                         flashcards.addReviewResult(card, recallGrade, nextReviewDate)
                         showNextQuestion()
                     }
-                }()
+                }(gapLeft = if (index == 0) LEFT_MARGIN else 0)
             }
         }
 
@@ -169,47 +155,38 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
     }
 
     private fun LayoutBuilder.showProgress() {
+        val (totalPoints, totalShortcuts) = flashcards.getCurrentLearnProgress()
 
         row {
-
-            JPanel(BorderLayout()).apply {
-                preferredSize = Dimension(800, 800)
-                add(
-                        Label("Current learn progress ${flashcards.getCurrentLearnProgress()}", Label.RIGHT).apply {
-                            font = Font("Verdana", Font.PLAIN, 15)
-                        }, BorderLayout.PAGE_END)
-
+            Label(" ")(CCFlags.push)
+        }
+        row {
+            Label("Current learn progress ${(totalPoints * 100 / totalShortcuts)}%. Learned $totalPoints from $totalShortcuts shortcuts.").apply {
+                font = UIUtil.getLabelFont().deriveFont(15.0f)
             }()
         }
-
     }
 
     private fun LayoutBuilder.showAction(action: AnAction?) {
+        row(" ") {}
         row {
-            label(gapLeft = LEFT_MARGIN, text = (" "))
-        }
-        row {
-            label(gapLeft = LEFT_MARGIN, text = "")
             Label("Do you remember the shortcut for the following action?").apply {
-                font = Font("Verdana", Font.PLAIN, 15)
-            }()
+                font = UIUtil.getLabelFont().deriveFont(15.0f)
+            }(gapLeft = LEFT_MARGIN)
         }
+        row(" ") {}
         row {
-            label(gapLeft = LEFT_MARGIN, text = (" "))
-        }
-        row {
-            label(gapLeft = LEFT_MARGIN, text = "")
-            Label(action?.templatePresentation?.text ?: "").apply {
+            Label(action?.templatePresentation?.text ?: " ").apply {
                 icon = action?.templatePresentation?.icon
-                font = Font("Verdana", Font.BOLD, 18)
-            }()
+                font = UIUtil.getLabelFont().deriveFont(Font.BOLD, 18.0f)
+            }(gapLeft = LEFT_MARGIN)
         }
+        noteRow("")
         row {
-            label(gapLeft = LEFT_MARGIN, text = "")
             action?.templatePresentation?.description?.let {
                 Label(it).apply {
-                    font = Font("Verdana", Font.BOLD, 14)
-                }()
+                    font = UIUtil.getLabelFont().deriveFont(Font.BOLD, 14.0f)
+                }(gapLeft = LEFT_MARGIN)
             }
         }
     }
