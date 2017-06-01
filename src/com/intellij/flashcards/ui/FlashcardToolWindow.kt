@@ -1,12 +1,13 @@
 package com.intellij.flashcards.ui
 
-import com.intellij.flashcards.Flashcard
-import com.intellij.flashcards.FlashcardsComponent
-import com.intellij.flashcards.RecallGrade
+import com.intellij.flashcards.Flashcards
+import com.intellij.flashcards.action
+import com.intellij.flashcards.data.Flashcard
+import com.intellij.flashcards.data.RecallGrade
 import com.intellij.flashcards.keymap.SubKeymapUtil
 import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ProjectComponent
+import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.IconLoader
 import com.intellij.openapi.wm.ToolWindow
@@ -29,7 +30,7 @@ import javax.swing.border.EmptyBorder
 class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindowManager) : ProjectComponent {
     private lateinit var toolWindow: ToolWindow
 
-    private val flashcards = ApplicationManager.getApplication().getComponent(FlashcardsComponent::class.java)
+    private val flashcards = ServiceManager.getService(Flashcards::class.java)
 
     override fun getComponentName(): String {
         return FlashcardToolWindow::class.simpleName!!
@@ -105,7 +106,7 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
         card.shortcuts.forEach {
             row {
                 label(gapLeft = 5 * LEFT_MARGIN, text = " ")
-                Label(arrayOf(it.first, it.second)
+                Label(arrayOf(it.firstKeyStroke, it.secondKeyStroke)
                         .filterNotNull()
                         .map { SubKeymapUtil.getKeyStrokeTextSub(it) }
                         .joinToString()).apply {

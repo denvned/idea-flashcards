@@ -25,15 +25,8 @@
   -->
 
   <extensions defaultExtensionNs="com.intellij">
-    <!-- Add your extensions here -->
+    <applicationService serviceInterface="com.intellij.flashcards.Flashcards" serviceImplementation="com.intellij.flashcards.Flashcards" />
   </extensions>
-
-  <application-components>
-    <component>
-      <interface-class>com.intellij.flashcards.FlashcardsComponent</interface-class>
-      <implementation-class>com.intellij.flashcards.FlashcardsComponent</implementation-class>
-    </component>
-  </application-components>
 
   <project-components>
     <component>

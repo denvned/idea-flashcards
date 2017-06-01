@@ -1,9 +1,9 @@
 package com.intellij.flashcards.keymap;
 
+import com.intellij.flashcards.data.KeyStroke;
 import com.intellij.openapi.keymap.MacKeymapUtil;
 import com.intellij.openapi.util.SystemInfo;
 
-import javax.swing.*;
 import java.awt.event.KeyEvent;
 
 /**
