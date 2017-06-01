@@ -97,4 +97,8 @@ class FlashcardsComponent : ApplicationComponent {
 
     override fun disposeComponent() {
     }
+
+    fun getCurrentLearnProgress(): String {
+        return "42%"
+    }
 }

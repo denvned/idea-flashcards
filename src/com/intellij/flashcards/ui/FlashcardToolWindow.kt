@@ -16,11 +16,13 @@ import com.intellij.ui.components.Label
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.layout.LayoutBuilder
 import com.intellij.ui.layout.panel
+import com.intellij.util.ui.UIUtil
 import java.awt.*
-import javax.swing.*
+import javax.swing.BorderFactory
+import javax.swing.JButton
+import javax.swing.JPanel
 import javax.swing.border.CompoundBorder
 import javax.swing.border.EmptyBorder
-import java.awt.Dimension
 
 
 class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindowManager) : ProjectComponent {
@@ -54,7 +56,6 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
     }
 
     fun showNextQuestion() {
-        val flashcards = ApplicationManager.getApplication().getComponent(FlashcardsComponent::class.java)
         val card = flashcards.getNextCardToReview()
         card?.let { showQuestion(it) } ?: showNoMoreCards()
     }
@@ -76,7 +77,7 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
     }
 
     private fun showQuestion(card: Flashcard) = showContent {
-        showAction(card)
+        showAction(card.action)
         row {
             label(gapLeft = LEFT_MARGIN, text = " ")
         }
@@ -88,7 +89,7 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
                 isOpaque = true
                 isBorderPainted = false
                 addActionListener {
-                    showAnswer(action)
+                    showAnswer(card)
                 }
             }()
         }
@@ -106,7 +107,8 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
                         .filterNotNull()
                         .map { SubKeymapUtil.getKeyStrokeTextSub(it) }
                         .joinToString()).apply {
-                    font = Font("Verdana", Font.PLAIN, 40)
+                    val buttonFont = UIUtil.getButtonFont()
+                    font = buttonFont.deriveFont(buttonFont.style, 2.0f * buttonFont.size)
                     border = CompoundBorder(BorderFactory.createRaisedSoftBevelBorder(), EmptyBorder(0, 10, 0, 10))
                     background = Color.WHITE
                     isOpaque = true
@@ -132,13 +134,16 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
         row {
 
             label(gapLeft = LEFT_MARGIN, text = "")
-            RecallGrade.values().forEach {
-                JButton(it.text).apply {
-                    border = CompoundBorder(BorderFactory.createLineBorder(it.color, 1), CompoundBorder(BorderFactory.createRaisedSoftBevelBorder(), EmptyBorder(0, 10, 0, 10)))
+            RecallGrade.values().forEach { recallGrade ->
+                val nextReviewDate = flashcards.calculateNextReviewDate(card, recallGrade)
+
+                JButton(recallGrade.text).apply {
+                    border = CompoundBorder(BorderFactory.createLineBorder(recallGrade.color, 1), CompoundBorder(BorderFactory.createRaisedSoftBevelBorder(), EmptyBorder(0, 10, 0, 10)))
                     //background = it.color
                     isOpaque = true
                     //isBorderPainted = false
                     addActionListener {
+                        flashcards.addReviewResult(card, recallGrade, nextReviewDate)
                         showNextQuestion()
                     }
                 }()
@@ -190,14 +195,14 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
         }
         row {
             label(gapLeft = LEFT_MARGIN, text = "")
-            Label(action.templatePresentation.text ?: "").apply {
-                icon = action.templatePresentation.icon
+            Label(action?.templatePresentation?.text ?: "").apply {
+                icon = action?.templatePresentation?.icon
                 font = Font("Verdana", Font.BOLD, 18)
             }()
         }
         row {
             label(gapLeft = LEFT_MARGIN, text = "")
-            action.templatePresentation.description?.let {
+            action?.templatePresentation?.description?.let {
                 Label(it).apply {
                     font = Font("Verdana", Font.BOLD, 14)
                 }()
