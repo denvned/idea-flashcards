@@ -26,16 +26,12 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
-    <applicationService
-            serviceInterface="com.intellij.flashcards.storage.FlashcardStorage"
-            serviceImplementation="com.intellij.flashcards.storage.FlashcardStorage">
-    </applicationService>
   </extensions>
 
   <application-components>
     <component>
-      <interface-class>com.intellij.flashcards.Flashcards</interface-class>
-      <implementation-class>com.intellij.flashcards.Flashcards</implementation-class>
+      <interface-class>com.intellij.flashcards.FlashcardsComponent</interface-class>
+      <implementation-class>com.intellij.flashcards.FlashcardsComponent</implementation-class>
     </component>
   </application-components>
 

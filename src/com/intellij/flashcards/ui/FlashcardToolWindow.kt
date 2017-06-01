@@ -1,10 +1,10 @@
 package com.intellij.flashcards.ui
 
-import com.intellij.flashcards.Flashcards
+import com.intellij.flashcards.Flashcard
+import com.intellij.flashcards.FlashcardsComponent
 import com.intellij.flashcards.RecallGrade
 import com.intellij.flashcards.keymap.SubKeymapUtil
 import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.project.Project
@@ -26,7 +26,7 @@ import java.awt.Dimension
 class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindowManager) : ProjectComponent {
     private lateinit var toolWindow: ToolWindow
 
-    private val flashcards = ApplicationManager.getApplication().getComponent("Flashcards") as Flashcards
+    private val flashcards = ApplicationManager.getApplication().getComponent(FlashcardsComponent::class.java)
 
     override fun getComponentName(): String {
         return FlashcardToolWindow::class.simpleName!!
@@ -53,17 +53,21 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
         toolWindow.activate(null)
     }
 
-
     fun showNextQuestion() {
-
-        val action = flashcards.getNextReviewAction()
-        showQuestion(action)
+        val flashcards = ApplicationManager.getApplication().getComponent(FlashcardsComponent::class.java)
+        val card = flashcards.getNextCardToReview()
+        card?.let { showQuestion(it) } ?: showNoMoreCards()
     }
 
-    fun showCard(init: LayoutBuilder.() -> Unit) {
+    private fun showNoMoreCards() = showContent {
+        row {
+            label(gapLeft = LEFT_MARGIN, text = "Congratulations, you review all the cards for now!")
+        }
+    }
+
+    fun showContent(init: LayoutBuilder.() -> Unit) {
         val panel = panel {
             init()
-
         }
 
         val content = ContentFactory.SERVICE.getInstance().createContent(panel, "", false)
@@ -71,51 +75,45 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
         toolWindow.contentManager.addContent(content)
     }
 
-    private fun showQuestion(action: AnAction) {
-        showCard {
-            showAction(action)
-            row {
-                label(gapLeft = LEFT_MARGIN, text = " ")
-            }
-            row {
-                label(gapLeft = 12 * LEFT_MARGIN, text = "")
-                JButton("Show Answer").apply {
-                    //border = CompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 2), EmptyBorder(0, 10, 0, 10))
-                    border = CompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 1), CompoundBorder(BorderFactory.createRaisedSoftBevelBorder(), EmptyBorder(0, 10, 0, 10)))
-                    isOpaque = true
-                    isBorderPainted = false
-                    addActionListener {
-                        showAnswer(action)
-                    }
-                }()
-            }
-            showProgress()
+    private fun showQuestion(card: Flashcard) = showContent {
+        showAction(card)
+        row {
+            label(gapLeft = LEFT_MARGIN, text = " ")
         }
+        row {
+            label(gapLeft = 12 * LEFT_MARGIN, text = "")
+            JButton("Show Answer").apply {
+                //border = CompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 2), EmptyBorder(0, 10, 0, 10))
+                border = CompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 1), CompoundBorder(BorderFactory.createRaisedSoftBevelBorder(), EmptyBorder(0, 10, 0, 10)))
+                isOpaque = true
+                isBorderPainted = false
+                addActionListener {
+                    showAnswer(action)
+                }
+            }()
+        }
+        showProgress()
     }
 
-    private fun showAnswer(action: AnAction) {
-        showCard {
-            showAction(action)
-            row { label(gapLeft = LEFT_MARGIN, text = " ") }
-            row { label(gapLeft = LEFT_MARGIN, text = " ") }
-            action.shortcutSet.shortcuts.filterIsInstance<KeyboardShortcut>().forEach {
-                row {
-
-                    label(gapLeft = 5 * LEFT_MARGIN, text = " ")
-                    Label(arrayOf(it.firstKeyStroke, it.secondKeyStroke)
-                            .filterNotNull()
-                            .map { SubKeymapUtil.getKeyStrokeTextSub(it) }
-                            .joinToString()).apply {
-                        font = Font("Verdana", Font.PLAIN, 40)
-                        border = CompoundBorder(BorderFactory.createRaisedSoftBevelBorder(), EmptyBorder(0, 10, 0, 10))
-                        background = Color.WHITE
-                        isOpaque = true
-
-
-                    }()
-                }
+    private fun showAnswer(card: Flashcard) = showContent {
+        showAction(card.action)
+        row { label(gapLeft = LEFT_MARGIN, text = " ") }
+        row { label(gapLeft = LEFT_MARGIN, text = " ") }
+        card.shortcuts.forEach {
+            row {
+                label(gapLeft = 5 * LEFT_MARGIN, text = " ")
+                Label(arrayOf(it.first, it.second)
+                        .filterNotNull()
+                        .map { SubKeymapUtil.getKeyStrokeTextSub(it) }
+                        .joinToString()).apply {
+                    font = Font("Verdana", Font.PLAIN, 40)
+                    border = CompoundBorder(BorderFactory.createRaisedSoftBevelBorder(), EmptyBorder(0, 10, 0, 10))
+                    background = Color.WHITE
+                    isOpaque = true
+                }()
             }
-            row { label(gapLeft = LEFT_MARGIN, text = " ") }
+        }
+        row { label(gapLeft = LEFT_MARGIN, text = " ") }
 //            row { label(gapLeft = LEFT_MARGIN, text = " ") }
 //            row {
 //                label(gapLeft = LEFT_MARGIN, text = "")
@@ -124,28 +122,28 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
 //                    preferredSize = Dimension(420, 1)
 //                }()
 //            }
-            row { label(gapLeft = LEFT_MARGIN, text = " ") }
-            row {
-                label(gapLeft = LEFT_MARGIN, text = "")
-                Label("How hard was it to recall?").apply {
-                    font = Font("Verdana", Font.PLAIN, 15)
+        row { label(gapLeft = LEFT_MARGIN, text = " ") }
+        row {
+            label(gapLeft = LEFT_MARGIN, text = "")
+            Label("How hard was it to recall?").apply {
+                font = Font("Verdana", Font.PLAIN, 15)
+            }()
+        }
+        row {
+
+            label(gapLeft = LEFT_MARGIN, text = "")
+            RecallGrade.values().forEach {
+                JButton(it.text).apply {
+                    border = CompoundBorder(BorderFactory.createLineBorder(it.color, 1), CompoundBorder(BorderFactory.createRaisedSoftBevelBorder(), EmptyBorder(0, 10, 0, 10)))
+                    //background = it.color
+                    isOpaque = true
+                    //isBorderPainted = false
+                    addActionListener {
+                        showNextQuestion()
+                    }
                 }()
             }
-            row {
-
-                label(gapLeft = LEFT_MARGIN, text = "")
-                RecallGrade.values().forEach {
-                    JButton(it.text).apply {
-                        border = CompoundBorder(BorderFactory.createLineBorder(it.color, 1), CompoundBorder(BorderFactory.createRaisedSoftBevelBorder(), EmptyBorder(0, 10, 0, 10)))
-                        //background = it.color
-                        isOpaque = true
-                        //isBorderPainted = false
-                        addActionListener {
-                            showNextQuestion()
-                        }
-                    }()
-                }
-            }
+        }
 
 //            row {
 //
@@ -158,8 +156,7 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
 //
 //                }()
 //            }
-            showProgress()
-        }
+        showProgress()
     }
 
     private fun LayoutBuilder.showProgress() {
@@ -178,7 +175,7 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
 
     }
 
-    private fun LayoutBuilder.showAction(action: AnAction) {
+    private fun LayoutBuilder.showAction(action: AnAction?) {
         row {
             label(gapLeft = LEFT_MARGIN, text = (" "))
         }
