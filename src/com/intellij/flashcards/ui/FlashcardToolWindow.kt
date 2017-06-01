@@ -18,6 +18,7 @@ import com.intellij.ui.layout.LayoutBuilder
 import com.intellij.ui.layout.panel
 import com.intellij.util.ui.UIUtil
 import java.awt.*
+import java.awt.event.KeyEvent
 import javax.swing.BorderFactory
 import javax.swing.JButton
 import javax.swing.JPanel
@@ -88,6 +89,7 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
                 border = CompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 1), CompoundBorder(BorderFactory.createRaisedSoftBevelBorder(), EmptyBorder(0, 10, 0, 10)))
                 isOpaque = true
                 isBorderPainted = false
+                mnemonic = KeyEvent.VK_S
                 addActionListener {
                     showAnswer(card)
                 }
@@ -142,6 +144,7 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
                     //background = it.color
                     isOpaque = true
                     //isBorderPainted = false
+                    mnemonic = recallGrade.mnemonic
                     addActionListener {
                         flashcards.addReviewResult(card, recallGrade, nextReviewDate)
                         showNextQuestion()

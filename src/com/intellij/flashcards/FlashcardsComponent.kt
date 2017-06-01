@@ -7,6 +7,7 @@ import com.intellij.openapi.components.ApplicationComponent
 import com.intellij.openapi.diagnostic.Logger
 import java.time.Duration
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -39,6 +40,7 @@ class FlashcardsComponent : ApplicationComponent {
     private val INITIAL_INTERVAL = Duration.ofHours(2)
     private val TARGET_PROBABILITY = 0.7
     private val MILLIS_PER_DAY = 24 * 60 * 60 * 1000.0
+    private val SHORTCUT_LEARNED_INTERVAL = 30
 
     class ReviewResult(
             val card: Flashcard,
@@ -99,6 +101,8 @@ class FlashcardsComponent : ApplicationComponent {
     }
 
     fun getCurrentLearnProgress(): String {
-        return "42%"
+        val totalShortcuts = learnQueue.size + reviewQueue.size
+        val totalPoints = reviewQueue.count { it.lastReviewDate!!.until(it.nextReviewDate, ChronoUnit.DAYS) > SHORTCUT_LEARNED_INTERVAL }
+        return "${(totalPoints * 100 / totalShortcuts)}%. Learned $totalPoints from $totalShortcuts shortcuts."
     }
 }
