@@ -47,7 +47,7 @@
   </project-components>
 
   <actions>
-    <action id="Flashcards" class="com.intellij.flashcards.ui.ShowFlashcards" text="Flashcards"
+    <action id="Flashcards" class="com.intellij.flashcards.ui.ShowFlashcardsAction" text="Flashcards"
             description="Learn keyboard shortcuts">
       <add-to-group group-id="HelpMenu" anchor="after" relative-to-action="ProductivityGuide"/>
     </action>

@@ -45,6 +45,7 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
 
     fun show() {
         toolWindow.show(null)
+        toolWindow.activate(null)
     }
 
     fun showNextQuestion() {

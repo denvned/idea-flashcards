@@ -4,7 +4,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 
-class ShowFlashcards : AnAction() {
+class ShowFlashcardsAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.getData(CommonDataKeys.PROJECT)
         project?.let { FlashcardToolWindow.getInstance(it).show() }
