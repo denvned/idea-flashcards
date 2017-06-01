@@ -137,9 +137,9 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
                 RecallGrade.values().forEach {
                     JButton(it.text).apply {
                         border = CompoundBorder(BorderFactory.createLineBorder(it.color, 1), CompoundBorder(BorderFactory.createRaisedSoftBevelBorder(), EmptyBorder(0, 10, 0, 10)))
-                        background = it.color
+                        //background = it.color
                         isOpaque = true
-                        isBorderPainted = false
+                        //isBorderPainted = false
                         addActionListener {
                             showNextQuestion()
                         }
@@ -167,7 +167,7 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
         row {
 
             JPanel(BorderLayout()).apply {
-                preferredSize = Dimension(600, 400)
+                preferredSize = Dimension(800, 800)
                 add(
                         Label("Current learn progress ${flashcards.getCurrentLearnProgress()}", Label.RIGHT).apply {
                             font = Font("Verdana", Font.PLAIN, 15)
