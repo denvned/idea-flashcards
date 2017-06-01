@@ -16,9 +16,14 @@ import com.intellij.ui.components.Label
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.layout.LayoutBuilder
 import com.intellij.ui.layout.panel
+import java.awt.Color
+import java.awt.Dimension
 import java.awt.Font
-import java.awt.Rectangle
+import javax.swing.BorderFactory
 import javax.swing.JButton
+import javax.swing.JSeparator
+import javax.swing.border.CompoundBorder
+import javax.swing.border.EmptyBorder
 
 class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindowManager): ProjectComponent {
     private lateinit var toolWindow: ToolWindow
@@ -48,6 +53,7 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
         toolWindow.activate(null)
     }
 
+
     fun showNextQuestion() {
         val flashcards = ApplicationManager.getApplication().getComponent("Flashcards") as Flashcards
         val action = flashcards.getNextReviewAction()
@@ -57,6 +63,7 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
     fun showCard(init: LayoutBuilder.() -> Unit) {
         val panel = panel {
             init()
+
         }
 
         val content = ContentFactory.SERVICE.getInstance().createContent(panel, "", false)
@@ -68,7 +75,10 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
         showCard {
             showAction(action)
             row {
-                label(gapLeft = LEFT_MARGIN, text = "")
+                label(gapLeft = LEFT_MARGIN, text = " ")
+            }
+            row {
+                label(gapLeft = 12 * LEFT_MARGIN, text = "")
                 JButton("Show Answer").apply {
                     addActionListener {
                         showAnswer(action)
@@ -81,23 +91,47 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
     private fun showAnswer(action: AnAction) {
         showCard {
             showAction(action)
+//            row {
+//                label(gapLeft = LEFT_MARGIN, text = " ")
+//            }
 
-            row {
-                label(gapLeft = LEFT_MARGIN, text = "Answer:")
-            }
+//            row {
+//                label(gapLeft = LEFT_MARGIN, text = "")
+//                Label("Answer:").apply {
+//                    font = Font("Verdana", Font.PLAIN, 15)
+//                }()
+//            }
+            row { label(gapLeft = LEFT_MARGIN, text = " ") }
             action.shortcutSet.shortcuts.filterIsInstance<KeyboardShortcut>().forEach {
                 row {
-                    label(gapLeft = LEFT_MARGIN, text = (""))
 
-                    val button = JButton(arrayOf(it.firstKeyStroke, it.secondKeyStroke)
+                    label(gapLeft = 5 * LEFT_MARGIN, text = " ")
+                    Label(arrayOf(it.firstKeyStroke, it.secondKeyStroke)
                             .filterNotNull()
                             .map { SubKeymapUtil.getKeyStrokeTextSub(it) }
-                            .joinToString())()
-                            .apply { enabled = false }
+                            .joinToString()).apply {
+                        font = Font("Verdana", Font.PLAIN, 40)
+                        border = CompoundBorder(BorderFactory.createRaisedSoftBevelBorder(), EmptyBorder(0,10,0,10))
+                        background = Color.WHITE
+                        isOpaque = true
+
+
+                    }()
                 }
             }
+            row { label(gapLeft = LEFT_MARGIN, text = " ") }
             row {
-                label(gapLeft = LEFT_MARGIN, text = ("How hard was it to recall?"), bold = true)
+                label(gapLeft = LEFT_MARGIN, text = "")
+                JSeparator(JSeparator.HORIZONTAL).apply {
+                    border = BorderFactory.createLineBorder(Color.GRAY)
+                    preferredSize = Dimension(420, 1)
+                }()
+            }
+            row {
+                label(gapLeft = LEFT_MARGIN, text = "")
+                Label("How hard was it to recall?").apply {
+                    font = Font("Verdana", Font.PLAIN, 15)
+                }()
             }
             row {
 
@@ -117,21 +151,41 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
         row {
             label(gapLeft = LEFT_MARGIN, text = (" "))
         }
-
         row {
-            label(gapLeft = LEFT_MARGIN, text = ("Do you remember the shortcut for the following action?"))
+            label(gapLeft = LEFT_MARGIN, text = "")
+            Label("Do you remember the shortcut for the following action?").apply {
+                font = Font("Verdana", Font.PLAIN, 15)
+            }()
+        }
+        row {
+            label(gapLeft = LEFT_MARGIN, text = (" "))
         }
         row {
             label(gapLeft = LEFT_MARGIN, text = "")
             Label(action.templatePresentation.text ?: "").apply {
                 icon = action.templatePresentation.icon
-                font = Font("Verdana", Font.BOLD, 12)
-                bounds = Rectangle(0, 0, 100, 100)
+                font = Font("Verdana", Font.BOLD, 18)
             }()
         }
         row {
-            label(gapLeft = LEFT_MARGIN, text = "Description: ${action.templatePresentation.description}")
+            label(gapLeft = LEFT_MARGIN, text = "")
+            action.templatePresentation.description?.let {
+                Label(it).apply {
+                    font = Font("Verdana", Font.BOLD, 14)
+                }()
+            }
         }
+        row {
+            label(gapLeft = LEFT_MARGIN, text = (" "))
+        }
+        row {
+            label(gapLeft = LEFT_MARGIN, text = "")
+            JSeparator(JSeparator.HORIZONTAL).apply {
+                border = BorderFactory.createLineBorder(Color.GRAY)
+                preferredSize = Dimension(420, 1)
+            }()
+        }
+
     }
 
     companion object {
