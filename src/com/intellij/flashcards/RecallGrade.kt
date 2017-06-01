@@ -1,5 +1,10 @@
 package com.intellij.flashcards
 
-enum class RecallGrade(val text: String) {
-    FAIL("Fail"), HARD("Hard"), GOOD("Good"), EASY("Easy")
+import java.awt.Color
+
+enum class RecallGrade(val text: String, val color: Color) {
+    FAIL("Fail", Color.RED),
+    HARD("Hard", Color.ORANGE),
+    GOOD("Good", Color.YELLOW),
+    EASY("Easy", Color.GREEN)
 }

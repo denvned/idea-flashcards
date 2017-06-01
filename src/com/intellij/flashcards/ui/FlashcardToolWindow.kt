@@ -16,17 +16,17 @@ import com.intellij.ui.components.Label
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.layout.LayoutBuilder
 import com.intellij.ui.layout.panel
-import java.awt.Color
-import java.awt.Dimension
-import java.awt.Font
-import javax.swing.BorderFactory
-import javax.swing.JButton
-import javax.swing.JSeparator
+import java.awt.*
+import javax.swing.*
 import javax.swing.border.CompoundBorder
 import javax.swing.border.EmptyBorder
+import java.awt.Dimension
 
-class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindowManager): ProjectComponent {
+
+class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindowManager) : ProjectComponent {
     private lateinit var toolWindow: ToolWindow
+
+    private val flashcards = ApplicationManager.getApplication().getComponent("Flashcards") as Flashcards
 
     override fun getComponentName(): String {
         return FlashcardToolWindow::class.simpleName!!
@@ -55,7 +55,7 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
 
 
     fun showNextQuestion() {
-        val flashcards = ApplicationManager.getApplication().getComponent("Flashcards") as Flashcards
+
         val action = flashcards.getNextReviewAction()
         showQuestion(action)
     }
@@ -80,27 +80,23 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
             row {
                 label(gapLeft = 12 * LEFT_MARGIN, text = "")
                 JButton("Show Answer").apply {
+                    //border = CompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 2), EmptyBorder(0, 10, 0, 10))
+                    border = CompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 1), CompoundBorder(BorderFactory.createRaisedSoftBevelBorder(), EmptyBorder(0, 10, 0, 10)))
+                    isOpaque = true
+                    isBorderPainted = false
                     addActionListener {
                         showAnswer(action)
                     }
                 }()
             }
+            showProgress()
         }
     }
 
     private fun showAnswer(action: AnAction) {
         showCard {
             showAction(action)
-//            row {
-//                label(gapLeft = LEFT_MARGIN, text = " ")
-//            }
-
-//            row {
-//                label(gapLeft = LEFT_MARGIN, text = "")
-//                Label("Answer:").apply {
-//                    font = Font("Verdana", Font.PLAIN, 15)
-//                }()
-//            }
+            row { label(gapLeft = LEFT_MARGIN, text = " ") }
             row { label(gapLeft = LEFT_MARGIN, text = " ") }
             action.shortcutSet.shortcuts.filterIsInstance<KeyboardShortcut>().forEach {
                 row {
@@ -111,7 +107,7 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
                             .map { SubKeymapUtil.getKeyStrokeTextSub(it) }
                             .joinToString()).apply {
                         font = Font("Verdana", Font.PLAIN, 40)
-                        border = CompoundBorder(BorderFactory.createRaisedSoftBevelBorder(), EmptyBorder(0,10,0,10))
+                        border = CompoundBorder(BorderFactory.createRaisedSoftBevelBorder(), EmptyBorder(0, 10, 0, 10))
                         background = Color.WHITE
                         isOpaque = true
 
@@ -120,13 +116,15 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
                 }
             }
             row { label(gapLeft = LEFT_MARGIN, text = " ") }
-            row {
-                label(gapLeft = LEFT_MARGIN, text = "")
-                JSeparator(JSeparator.HORIZONTAL).apply {
-                    border = BorderFactory.createLineBorder(Color.GRAY)
-                    preferredSize = Dimension(420, 1)
-                }()
-            }
+//            row { label(gapLeft = LEFT_MARGIN, text = " ") }
+//            row {
+//                label(gapLeft = LEFT_MARGIN, text = "")
+//                JSeparator(JSeparator.HORIZONTAL).apply {
+//                    border = BorderFactory.createLineBorder(Color.GRAY)
+//                    preferredSize = Dimension(420, 1)
+//                }()
+//            }
+            row { label(gapLeft = LEFT_MARGIN, text = " ") }
             row {
                 label(gapLeft = LEFT_MARGIN, text = "")
                 Label("How hard was it to recall?").apply {
@@ -138,13 +136,46 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
                 label(gapLeft = LEFT_MARGIN, text = "")
                 RecallGrade.values().forEach {
                     JButton(it.text).apply {
+                        border = CompoundBorder(BorderFactory.createLineBorder(it.color, 1), CompoundBorder(BorderFactory.createRaisedSoftBevelBorder(), EmptyBorder(0, 10, 0, 10)))
+                        background = it.color
+                        isOpaque = true
+                        isBorderPainted = false
                         addActionListener {
                             showNextQuestion()
                         }
                     }()
                 }
             }
+
+//            row {
+//
+//                JPanel(BorderLayout()).apply {
+//                    preferredSize = Dimension(600, 400)
+//                    add(
+//                            Label("Current learn progress ${flashcards.getCurrentLearnProgress()}", Label.RIGHT).apply {
+//                                font = Font("Verdana", Font.PLAIN, 15)
+//                            }, BorderLayout.PAGE_END)
+//
+//                }()
+//            }
+            showProgress()
         }
+    }
+
+    private fun LayoutBuilder.showProgress() {
+
+        row {
+
+            JPanel(BorderLayout()).apply {
+                preferredSize = Dimension(600, 400)
+                add(
+                        Label("Current learn progress ${flashcards.getCurrentLearnProgress()}", Label.RIGHT).apply {
+                            font = Font("Verdana", Font.PLAIN, 15)
+                        }, BorderLayout.PAGE_END)
+
+            }()
+        }
+
     }
 
     private fun LayoutBuilder.showAction(action: AnAction) {
@@ -175,17 +206,6 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
                 }()
             }
         }
-        row {
-            label(gapLeft = LEFT_MARGIN, text = (" "))
-        }
-        row {
-            label(gapLeft = LEFT_MARGIN, text = "")
-            JSeparator(JSeparator.HORIZONTAL).apply {
-                border = BorderFactory.createLineBorder(Color.GRAY)
-                preferredSize = Dimension(420, 1)
-            }()
-        }
-
     }
 
     companion object {
