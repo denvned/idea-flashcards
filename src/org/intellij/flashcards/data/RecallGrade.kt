@@ -1,4 +1,4 @@
-package com.intellij.flashcards.data
+package org.intellij.flashcards.data
 
 import java.awt.Color
 import java.awt.event.KeyEvent

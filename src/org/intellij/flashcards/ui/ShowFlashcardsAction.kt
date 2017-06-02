@@ -1,4 +1,4 @@
-package com.intellij.flashcards.ui
+package org.intellij.flashcards.ui
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent

@@ -1,4 +1,4 @@
-package com.intellij.flashcards.data
+package org.intellij.flashcards.data
 
 data class KeyStroke @JvmOverloads constructor(
         var keyChar: Int = 0,

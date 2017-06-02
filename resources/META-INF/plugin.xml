@@ -23,18 +23,18 @@
   <depends>com.intellij.modules.platform</depends>
 
   <extensions defaultExtensionNs="com.intellij">
-    <applicationService serviceInterface="com.intellij.flashcards.Flashcards" serviceImplementation="com.intellij.flashcards.Flashcards" />
+    <applicationService serviceInterface="org.intellij.flashcards.Flashcards" serviceImplementation="org.intellij.flashcards.Flashcards" />
   </extensions>
 
   <project-components>
     <component>
-      <interface-class>com.intellij.flashcards.ui.FlashcardToolWindow</interface-class>
-      <implementation-class>com.intellij.flashcards.ui.FlashcardToolWindow</implementation-class>
+      <interface-class>org.intellij.flashcards.ui.FlashcardToolWindow</interface-class>
+      <implementation-class>org.intellij.flashcards.ui.FlashcardToolWindow</implementation-class>
     </component>
   </project-components>
 
   <actions>
-    <action id="Flashcards" class="com.intellij.flashcards.ui.ShowFlashcardsAction" text="Flashcards"
+    <action id="Flashcards" class="org.intellij.flashcards.ui.ShowFlashcardsAction" text="Flashcards"
             description="Learn keyboard shortcuts">
       <add-to-group group-id="HelpMenu" anchor="after" relative-to-action="ProductivityGuide"/>
     </action>

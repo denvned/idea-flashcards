@@ -1,4 +1,4 @@
-package com.intellij.flashcards.data
+package org.intellij.flashcards.data
 
 import com.intellij.util.xmlb.annotations.AbstractCollection
 

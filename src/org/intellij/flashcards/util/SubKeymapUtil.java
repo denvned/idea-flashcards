@@ -1,8 +1,8 @@
-package com.intellij.flashcards.util;
+package org.intellij.flashcards.util;
 
-import com.intellij.flashcards.data.KeyStroke;
 import com.intellij.openapi.keymap.MacKeymapUtil;
 import com.intellij.openapi.util.SystemInfo;
+import org.intellij.flashcards.data.KeyStroke;
 
 import java.awt.event.KeyEvent;
 

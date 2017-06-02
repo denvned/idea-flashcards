@@ -1,16 +1,16 @@
-package com.intellij.flashcards
+package org.intellij.flashcards
 
-import com.intellij.flashcards.data.Database
-import com.intellij.flashcards.data.Flashcard
-import com.intellij.flashcards.data.RecallGrade
-import com.intellij.flashcards.data.ReviewResult
-import com.intellij.flashcards.util.actualCard
-import com.intellij.flashcards.util.toCard
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.logger
+import org.intellij.flashcards.data.Database
+import org.intellij.flashcards.data.Flashcard
+import org.intellij.flashcards.data.RecallGrade
+import org.intellij.flashcards.data.ReviewResult
+import org.intellij.flashcards.util.actualCard
+import org.intellij.flashcards.util.toCard
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -67,7 +67,7 @@ class Flashcards : PersistentStateComponent<Database> {
     private val Flashcard.lastReview get() = reviewResults[this]?.lastOrNull()
     private val Flashcard.lastReviewDate get() = lastReview?.date
     private val Flashcard.nextReviewDate get() = lastReview?.nextReviewDate
-    private val Flashcard.shouldReview get() = nextReviewDate?.compareTo(Date().time) ?: 0 <= 0
+    private val Flashcard.shouldReview get() = nextReviewDate?.compareTo(java.util.Date().time) ?: 0 <= 0
 
     fun calculateNextReviewDate(card: Flashcard, recallGrade: RecallGrade): Long {
         val now = Date().time

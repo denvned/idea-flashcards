@@ -1,4 +1,4 @@
-package com.intellij.flashcards.data
+package org.intellij.flashcards.data
 
 data class ReviewResult @JvmOverloads constructor(
         var date: Long = 0L,

@@ -1,4 +1,4 @@
-package com.intellij.flashcards.data
+package org.intellij.flashcards.data
 
 data class Shortcut @JvmOverloads constructor(
         var firstKeyStroke: KeyStroke? = null,

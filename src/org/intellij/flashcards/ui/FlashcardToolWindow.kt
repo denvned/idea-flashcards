@@ -1,10 +1,5 @@
-package com.intellij.flashcards.ui
+package org.intellij.flashcards.ui
 
-import com.intellij.flashcards.Flashcards
-import com.intellij.flashcards.data.Flashcard
-import com.intellij.flashcards.data.RecallGrade
-import com.intellij.flashcards.util.SubKeymapUtil
-import com.intellij.flashcards.util.action
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.components.ServiceManager
@@ -21,6 +16,11 @@ import com.intellij.ui.layout.LCFlags
 import com.intellij.ui.layout.LayoutBuilder
 import com.intellij.ui.layout.panel
 import com.intellij.util.ui.UIUtil
+import org.intellij.flashcards.Flashcards
+import org.intellij.flashcards.data.Flashcard
+import org.intellij.flashcards.data.RecallGrade
+import org.intellij.flashcards.util.SubKeymapUtil
+import org.intellij.flashcards.util.action
 import java.awt.Color
 import java.awt.Font
 import java.awt.event.KeyEvent

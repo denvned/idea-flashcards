@@ -1,11 +1,11 @@
-package com.intellij.flashcards.util
+package org.intellij.flashcards.util
 
-import com.intellij.flashcards.data.Flashcard
-import com.intellij.flashcards.data.KeyStroke
-import com.intellij.flashcards.data.Shortcut
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.KeyboardShortcut
+import org.intellij.flashcards.data.Flashcard
+import org.intellij.flashcards.data.KeyStroke
+import org.intellij.flashcards.data.Shortcut
 
 val Flashcard.action get(): AnAction? = actionId?.let { ActionManager.getInstance().getAction(it) }
 
