@@ -4,6 +4,8 @@ import com.intellij.flashcards.data.Database
 import com.intellij.flashcards.data.Flashcard
 import com.intellij.flashcards.data.RecallGrade
 import com.intellij.flashcards.data.ReviewResult
+import com.intellij.flashcards.util.actualCard
+import com.intellij.flashcards.util.toCard
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State

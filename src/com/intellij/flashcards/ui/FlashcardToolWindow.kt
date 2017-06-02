@@ -1,10 +1,10 @@
 package com.intellij.flashcards.ui
 
 import com.intellij.flashcards.Flashcards
-import com.intellij.flashcards.action
 import com.intellij.flashcards.data.Flashcard
 import com.intellij.flashcards.data.RecallGrade
-import com.intellij.flashcards.keymap.SubKeymapUtil
+import com.intellij.flashcards.util.SubKeymapUtil
+import com.intellij.flashcards.util.action
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.components.ServiceManager
@@ -91,7 +91,7 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
                 isBorderPainted = false
                 mnemonic = KeyEvent.VK_I
                 addActionListener {
-                    if (Messages.showOkCancelDialog(project, "You you sure you don't want to see this card ever again?", "Ignore Action", Messages.getQuestionIcon()) == Messages.OK) {
+                    if (Messages.showOkCancelDialog(project, "Are you sure you don't want to see this card ever again?", "Ignore Action", Messages.getQuestionIcon()) == Messages.OK) {
                         flashcards.ignoreAction(card.actionId!!)
                         showNextQuestion()
                     }

@@ -1,4 +1,4 @@
-package com.intellij.flashcards
+package com.intellij.flashcards.util
 
 import com.intellij.flashcards.data.Flashcard
 import com.intellij.flashcards.data.KeyStroke
