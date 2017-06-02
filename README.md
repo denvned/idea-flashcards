@@ -1,7 +1,9 @@
-hackathon17-flashcards
-======================
+IntelliJ Flashcards
+===================
 
-SSH clone URL: ssh://git@git-hosting.labs.intellij.net/hackathon17-flashcards.git
-HTTPS clone URL: https://git-hosting.labs.intellij.net/hackathon17-flashcards.git
+Learn IDE keyboard shortcuts using flashcards.
 
-Develop with pleasure!
+**Authors:**
+
+- [Denis Nedelyaev](https://github.com/denvned)
+- [Oleg Bakhirev](https://github.com/OlegBakhirev)
