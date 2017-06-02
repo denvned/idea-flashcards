@@ -5,7 +5,13 @@
   <vendor email="denis.nedelyaev@jetbrains.com" url="https://www.jetbrains.com">JetBrains</vendor>
 
   <description><![CDATA[
-      Learn IDE keyboard shortcuts using flashcards.
+      <p>Learn IDE keyboard shortcuts using flashcards.</p>
+
+      <p><strong>Authors:</strong></p>
+      <ul>
+        <li><a href="mailto:denis.nedelyaev@jetbrains.com">Denis Nedelyaev</a></li>
+        <li><a href="mailto:oleg.bakhirev@jetbrains.com">Oleg Bakhirev</a></li>
+      </ul>
   ]]></description>
 
   <change-notes><![CDATA[
