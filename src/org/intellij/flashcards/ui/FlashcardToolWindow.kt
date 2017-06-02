@@ -96,7 +96,7 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
                         showNextQuestion()
                     }
                 }
-            }(gapLeft = 10 * LEFT_MARGIN)
+            }(gapLeft = LEFT_MARGIN)
             JButton("Show Answer").apply {
                 //border = CompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 2), EmptyBorder(0, 10, 0, 10))
                 border = CompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 1), CompoundBorder(BorderFactory.createRaisedSoftBevelBorder(), EmptyBorder(0, 10, 0, 10)))
