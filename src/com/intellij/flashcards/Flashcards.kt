@@ -23,6 +23,7 @@ class Flashcards : PersistentStateComponent<Database> {
     private val reviewQueue = TreeSet<Flashcard>(compareBy {
         it.lastReview?.nextReviewDate ?: 0L
     })
+    private val ignoredActions = mutableSetOf<String>()
 
     override fun loadState(state: Database) {
         learnQueue -= state.learnQueue
@@ -34,9 +35,14 @@ class Flashcards : PersistentStateComponent<Database> {
 
         reviewQueue += reviewResults.keys
         learnQueue -= reviewResults.keys.mapNotNull { it.actionId }
+
+        ignoredActions += state.ignoredActions
+
+        reviewQueue.removeIf { it.actionId in ignoredActions }
+        learnQueue -= ignoredActions
     }
 
-    override fun getState() = Database(learnQueue.toMutableList(), reviewResults)
+    override fun getState() = Database(learnQueue.toMutableList(), reviewResults, ignoredActions)
 
     tailrec fun getNextCardToReview(): Flashcard? {
         val card = reviewQueue.firstOrNull()?.takeIf { it.shouldReview } ?: return getNextCardToLearn()
@@ -79,6 +85,22 @@ class Flashcards : PersistentStateComponent<Database> {
         reviewQueue -= card
         reviewResults.getOrPut(card) { ArrayList() } += ReviewResult(Date().time, recallGrade, nextReviewDate)
         reviewQueue += card
+    }
+
+    fun ignoreAction(actionId: String) {
+        ignoredActions += actionId
+        learnQueue -= actionId
+        reviewQueue.removeIf { it.actionId == actionId }
+    }
+
+    fun stopIgnoringAction(actionId: String) {
+        ignoredActions -= actionId
+        val card = ActionManager.getInstance().getAction(actionId).toCard()
+        if (card in reviewResults) {
+            reviewQueue += card
+        } else {
+            learnQueue += actionId
+        }
     }
 
     fun getCurrentLearnProgress(): Pair<Int, Int> {

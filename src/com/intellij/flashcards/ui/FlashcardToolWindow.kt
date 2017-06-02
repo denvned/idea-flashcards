@@ -9,6 +9,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.IconLoader
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowAnchor
@@ -83,6 +84,19 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
         showAction(card.action)
         row(" ") {}
         row {
+            JButton("Ignore").apply {
+                //border = CompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 2), EmptyBorder(0, 10, 0, 10))
+                border = CompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 1), CompoundBorder(BorderFactory.createRaisedSoftBevelBorder(), EmptyBorder(0, 10, 0, 10)))
+                isOpaque = true
+                isBorderPainted = false
+                mnemonic = KeyEvent.VK_I
+                addActionListener {
+                    if (Messages.showOkCancelDialog(project, "You you sure you don't want to see this card ever again?", "Ignore Action", Messages.getQuestionIcon()) == Messages.OK) {
+                        flashcards.ignoreAction(card.actionId!!)
+                        showNextQuestion()
+                    }
+                }
+            }(gapLeft = 10 * LEFT_MARGIN)
             JButton("Show Answer").apply {
                 //border = CompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 2), EmptyBorder(0, 10, 0, 10))
                 border = CompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 1), CompoundBorder(BorderFactory.createRaisedSoftBevelBorder(), EmptyBorder(0, 10, 0, 10)))
@@ -92,7 +106,7 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
                 addActionListener {
                     showAnswer(card)
                 }
-            }(gapLeft = 12 * LEFT_MARGIN)
+            }()
         }
         showProgress()
     }
