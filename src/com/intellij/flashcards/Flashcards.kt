@@ -14,43 +14,46 @@ import kotlin.collections.ArrayList
 
 @State(name = "Flashcards", storages = arrayOf(Storage("flashcards.xml")), reloadable = false)
 class Flashcards : PersistentStateComponent<Database> {
-    override fun loadState(state: Database) {
-        learnQueue -= state.learnQueue
-        learnQueue += state.learnQueue
-
-        state.reviewResults.forEach { reviewResult ->
-            reviewResult.card?.let {
-                reviewResults.getOrPut(it) { mutableListOf() } += reviewResult
-            }
-        }
-
-        reviewQueue += reviewResults.keys
-        learnQueue -= reviewResults.keys
-    }
-
-    override fun getState() = Database(learnQueue.toMutableList(), reviewResults.values.flatten().toMutableList())
-
-    private val reviewResults: MutableMap<Flashcard, MutableList<ReviewResult>> = HashMap()
+    private val reviewResults: MutableMap<Flashcard, MutableList<ReviewResult>> = hashMapOf()
     private val learnQueue = ActionManager.getInstance().run {
-        getActionIds("").map { getAction(it).toCard() }.filterTo(linkedSetOf()) { it.shortcuts.isNotEmpty() }
+        getActionIds("").mapNotNull {
+            it.takeUnless { getAction(it).toCard().shortcuts.isEmpty() }
+        }.also { Collections.shuffle(it) }.toMutableSet()
     }
     private val reviewQueue = TreeSet<Flashcard>(compareBy {
         it.lastReview?.nextReviewDate ?: 0L
     })
 
+    override fun loadState(state: Database) {
+        learnQueue -= state.learnQueue
+        learnQueue += state.learnQueue
+
+        state.reviewResults.forEach { (card, reviews) ->
+            reviewResults.getOrPut(card) { mutableListOf() } += reviews
+        }
+
+        reviewQueue += reviewResults.keys
+        learnQueue -= reviewResults.keys.mapNotNull { it.actionId }
+    }
+
+    override fun getState() = Database(learnQueue.toMutableList(), reviewResults)
+
     tailrec fun getNextCardToReview(): Flashcard? {
-        val card = reviewQueue.firstOrNull()?.takeIf { it.shouldReview } ?: learnQueue.firstOrNull() ?: return null
+        val card = reviewQueue.firstOrNull()?.takeIf { it.shouldReview } ?: return getNextCardToLearn()
         val actualCard = card.actualCard
         val isObsolete = card != actualCard
         if (isObsolete) {
-            learnQueue -= card
             reviewQueue -= card
             if (actualCard != null && actualCard !in reviewQueue) {
-                learnQueue += actualCard
+                learnQueue += actualCard.actionId!!
             }
             return getNextCardToReview()
         }
         return card
+    }
+
+    fun getNextCardToLearn(): Flashcard? = learnQueue.firstOrNull()?.let {
+        ActionManager.getInstance().getAction(it).toCard()
     }
 
     private val Flashcard.lastReview get() = reviewResults[this]?.lastOrNull()
@@ -72,9 +75,9 @@ class Flashcards : PersistentStateComponent<Database> {
     }
 
     fun addReviewResult(card: Flashcard, recallGrade: RecallGrade, nextReviewDate: Long) {
-        learnQueue -= card
+        learnQueue -= card.actionId!!
         reviewQueue -= card
-        reviewResults.getOrPut(card) { ArrayList() } += ReviewResult(card, Date().time, recallGrade, nextReviewDate)
+        reviewResults.getOrPut(card) { ArrayList() } += ReviewResult(Date().time, recallGrade, nextReviewDate)
         reviewQueue += card
     }
 

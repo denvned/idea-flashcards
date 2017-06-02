@@ -111,6 +111,7 @@ class FlashcardToolWindow(val project: Project, val toolWindowManager: ToolWindo
                     font = buttonFont.deriveFont(buttonFont.style, 2.0f * buttonFont.size)
                     border = CompoundBorder(BorderFactory.createRaisedSoftBevelBorder(), EmptyBorder(0, 10, 0, 10))
                     background = Color.WHITE
+                    foreground = Color.BLACK
                     isOpaque = true
                 }(gapLeft = 5 * LEFT_MARGIN)
             }
